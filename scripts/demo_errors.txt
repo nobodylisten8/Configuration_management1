@@ -1,0 +1,5 @@
+# Testing error handling in scripts
+ls
+unknown_command_that_does_not_exist
+cd "test"
+exit

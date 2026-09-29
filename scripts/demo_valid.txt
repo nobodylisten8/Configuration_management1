@@ -1,0 +1,4 @@
+# This is a comment, it should be skipped
+ls "my folder" file2
+cd "path with spaces"
+ls
