@@ -1,8 +1,10 @@
 """Main entry point for shell emulator."""
 
 import argparse
+from .context import ShellContext
 from .repl import run_repl
 from .script_runner import run_script
+from .vfs import VFS
 
 
 def main() -> None:
@@ -14,7 +16,7 @@ def main() -> None:
         "--vfs-path",
         type=str,
         default=None,
-        help="Path to the physical location of the VFS"
+        help="Path to the physical location of the VFS (ZIP or B64)"
     )
     parser.add_argument(
         "--script-path",
@@ -32,10 +34,18 @@ def main() -> None:
     print(f"[DEBUG] Script Path: {script_info}")
     print("-" * 40)
 
+    ctx = ShellContext()
+
+    if args.vfs_path:
+        ctx.vfs = VFS(args.vfs_path)
+        if not ctx.vfs.load():
+            print("[DEBUG] Failed to load VFS, continuing without it.")
+            ctx.vfs = None
+
     if args.script_path:
-        run_script(args.script_path)
+        run_script(args.script_path, ctx)
     else:
-        run_repl()
+        run_repl(ctx)
 
 
 if __name__ == "__main__":

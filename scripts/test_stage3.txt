@@ -1,0 +1,6 @@
+# Testing Stage 3: VFS
+vfs-info
+ls "some" "args"
+unknown_command
+vfs-info
+exit

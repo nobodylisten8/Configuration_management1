@@ -20,3 +20,7 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Сгенерированные тестовые VFS архивы (нарушение Г1, Г2, если закоммитить)
+scripts/*.zip
+scripts/*.b64

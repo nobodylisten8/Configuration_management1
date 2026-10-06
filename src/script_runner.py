@@ -1,10 +1,11 @@
 """Module for running startup scripts."""
 
+from .context import ShellContext
 from .parser import parse_command
 from .commands import execute_command
 
 
-def run_script(script_path: str) -> None:
+def run_script(script_path: str, ctx: ShellContext) -> None:
     """
     Execute commands from a script file sequentially.
 
@@ -12,6 +13,7 @@ def run_script(script_path: str) -> None:
 
     Args:
         script_path: Path to the script file
+        ctx: Shell execution context
     """
     try:
         with open(script_path, "r", encoding="utf-8") as file:
@@ -28,7 +30,7 @@ def run_script(script_path: str) -> None:
                 if not command:
                     continue
 
-                should_exit = execute_command(command, args)
+                should_exit = execute_command(command, args, ctx)
 
                 if should_exit:
                     break

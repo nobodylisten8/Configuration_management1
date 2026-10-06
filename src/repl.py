@@ -1,19 +1,20 @@
 """REPL (Read-Eval-Print Loop) module."""
 
+from .context import ShellContext
 from .parser import parse_command
 from .commands import execute_command
 
-DEFAULT_VFS_NAME = "default_vfs"
 
-
-def run_repl(vfs_name: str = DEFAULT_VFS_NAME) -> None:
+def run_repl(ctx: ShellContext, vfs_name: str = "default_vfs") -> None:
     """
     Run interactive REPL loop.
 
     Args:
+        ctx: Shell execution context
         vfs_name: Name of virtual file system to display in prompt
     """
-    prompt = f"{vfs_name}> "
+    prompt_name = ctx.vfs.get_info()["name"] if ctx.vfs else vfs_name
+    prompt = f"{prompt_name}> "
 
     while True:
         try:
@@ -27,7 +28,7 @@ def run_repl(vfs_name: str = DEFAULT_VFS_NAME) -> None:
         if not command:
             continue
 
-        should_exit = execute_command(command, args)
+        should_exit = execute_command(command, args, ctx)
 
         if should_exit:
             break
