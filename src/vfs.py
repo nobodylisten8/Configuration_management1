@@ -23,6 +23,7 @@ class VFS:
         self._zip_data: Optional[bytes] = None
         self._sha256: Optional[str] = None
         self._zip_file: Optional[zipfile.ZipFile] = None
+        self._cwd = ""
 
     def load(self) -> bool:
         """
@@ -71,11 +72,148 @@ class VFS:
             "sha256": self._sha256 or "Not loaded"
         }
 
-    def get_zip_file(self) -> Optional[zipfile.ZipFile]:
+    def get_cwd(self) -> str:
         """
-        Get the in-memory ZIP file object.
+        Get current working directory.
 
         Returns:
-            ZipFile object or None if not loaded
+            Current working directory path (with leading /)
         """
-        return self._zip_file
+        if not self._cwd:
+            return "/"
+        return "/" + self._cwd
+
+    def _normalize(self, path: str) -> str:
+        """
+        Normalize path for ZIP lookup (no leading slash).
+
+        Args:
+            path: Path to normalize
+
+        Returns:
+            Normalized path without leading slash
+        """
+        if path == "/" or path == ".":
+            if path == "/":
+                return ""
+            return self._cwd
+
+        if path.startswith("/"):
+            base = ""
+            rest = path[1:]
+        else:
+            base = self._cwd
+            rest = path
+
+        if base:
+            full = f"{base}/{rest}"
+        else:
+            full = rest
+
+        parts = []
+        for p in full.split("/"):
+            if p == "." or p == "":
+                continue
+            elif p == "..":
+                if parts:
+                    parts.pop()
+            else:
+                parts.append(p)
+
+        return "/".join(parts)
+
+    def list_dir(self, path: Optional[str] = None) -> list[str]:
+        """
+        List contents of a directory.
+
+        Args:
+            path: Directory path (uses cwd if None)
+
+        Returns:
+            List of file/directory names
+        """
+        if self._zip_file is None:
+            return []
+
+        target = self._normalize(path or ".")
+        prefix = target + "/" if target else ""
+
+        entries = set()
+        for name in self._zip_file.namelist():
+            if prefix and not name.startswith(prefix):
+                continue
+            if prefix:
+                relative = name[len(prefix):]
+            else:
+                relative = name
+            first_part = relative.split("/")[0]
+            if first_part:
+                entries.add(first_part)
+
+        return sorted(entries)
+
+    def is_file(self, path: str) -> bool:
+        """
+        Check if a path is a file.
+
+        Args:
+            path: Path to check
+
+        Returns:
+            True if path is a file
+        """
+        if self._zip_file is None:
+            return False
+
+        target = self._normalize(path)
+        try:
+            self._zip_file.getinfo(target)
+            return True
+        except KeyError:
+            return False
+
+    def read_file(self, path: str) -> Optional[bytes]:
+        """
+        Read file contents.
+
+        Args:
+            path: Path to file
+
+        Returns:
+            File contents as bytes, or None if not found
+        """
+        if self._zip_file is None:
+            return None
+
+        target = self._normalize(path)
+        try:
+            return self._zip_file.read(target)
+        except KeyError:
+            return None
+
+    def change_dir(self, path: str) -> bool:
+        """
+        Change current working directory.
+
+        Args:
+            path: New directory path
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if self._zip_file is None:
+            return False
+
+        target = self._normalize(path)
+
+        if not target:
+            self._cwd = ""
+            return True
+
+        prefix = target + "/"
+        for name in self._zip_file.namelist():
+            if name.startswith(prefix):
+                self._cwd = target
+                return True
+
+        return False

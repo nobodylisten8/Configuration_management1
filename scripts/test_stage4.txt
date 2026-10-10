@@ -1,0 +1,18 @@
+# Testing Stage 4: Main commands
+pwd
+ls
+cd level1
+pwd
+ls
+cd level2
+pwd
+ls
+cd /
+pwd
+wc root_file.txt
+cd level1/level2/level3
+wc deep_file.txt
+uptime
+cd /nonexistent
+wc nonexistent_file.txt
+exit

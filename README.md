@@ -40,3 +40,21 @@ python -m src.main --vfs-path "/path/to/vfs"
 **Загрузка ZIP-архива:**
 ```bash
 python -m src.main --vfs-path "scripts/vfs_minimal.zip"
+````
+## Этап 4: Основные команды
+
+Реализована логика работы с VFS для основных UNIX-команд.
+
+### Команды:
+- `ls [path]` — список файлов и папок в указанной директории
+- `cd <path>` — сменить текущую директорию
+- `pwd` — показать текущий путь
+- `wc <file>` — подсчёт строк, слов и байт в файле
+- `uptime` — время работы эмулятора
+
+### Примеры использования:
+
+**Запуск тестового скрипта:**
+```bash
+python -m src.main --vfs-path "scripts/vfs_complex.zip" --script-path "scripts/test_stage4.txt"
+```

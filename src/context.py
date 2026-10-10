@@ -1,5 +1,6 @@
 """Shell execution context module."""
 
+import time
 from typing import Optional
 from .vfs import VFS
 
@@ -10,3 +11,4 @@ class ShellContext:
     def __init__(self) -> None:
         """Initialize an empty shell context."""
         self.vfs: Optional[VFS] = None
+        self.start_time: float = time.time()

@@ -23,22 +23,36 @@ def test_exit_command():
     assert result is True
 
 
-def test_ls_command(capsys):
-    """Test ls stub command."""
-    result = execute_command("ls", ["arg1", "arg2"], _make_ctx())
+def test_pwd_without_vfs(capsys):
+    """Test pwd command without loaded VFS."""
+    result = execute_command("pwd", [], _make_ctx())
     assert result is False
     captured = capsys.readouterr()
-    assert "Command: ls" in captured.out
-    assert "['arg1', 'arg2']" in captured.out
+    assert "No VFS" in captured.out
 
 
-def test_cd_command(capsys):
-    """Test cd stub command."""
-    result = execute_command("cd", ["path"], _make_ctx())
+def test_cd_missing_argument(capsys):
+    """Test cd command without argument."""
+    result = execute_command("cd", [], _make_ctx())
     assert result is False
     captured = capsys.readouterr()
-    assert "Command: cd" in captured.out
-    assert "['path']" in captured.out
+    assert "missing argument" in captured.out
+
+
+def test_wc_missing_file(capsys):
+    """Test wc command without file argument."""
+    result = execute_command("wc", [], _make_ctx())
+    assert result is False
+    captured = capsys.readouterr()
+    assert "missing file" in captured.out
+
+
+def test_uptime_command(capsys):
+    """Test uptime command output."""
+    result = execute_command("uptime", [], _make_ctx())
+    assert result is False
+    captured = capsys.readouterr()
+    assert "up" in captured.out
 
 
 def test_vfs_info_without_vfs(capsys):
