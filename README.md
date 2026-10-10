@@ -58,3 +58,18 @@ python -m src.main --vfs-path "scripts/vfs_minimal.zip"
 ```bash
 python -m src.main --vfs-path "scripts/vfs_complex.zip" --script-path "scripts/test_stage4.txt"
 ```
+## Этап 5: Дополнительные команды
+
+Добавлены дополнительные команды для работы с файлами.
+
+### Команды:
+- `cat <file>` — вывести содержимое файла
+- `rm <file>` — удалить файл из VFS (только в памяти)
+
+### Примеры использования:
+
+**Просмотр содержимого файла:**
+```bash
+vfs_complex.zip> cat root_file.txt
+Root content
+```

@@ -1,0 +1,12 @@
+# Testing Stage 5: Additional commands and error handling
+cat root_file.txt
+cd level1
+cat file1.txt
+cd /
+cat nonexistent_file.txt
+cat
+rm nonexistent_file.txt
+rm
+rm root_file.txt
+cat root_file.txt
+exit

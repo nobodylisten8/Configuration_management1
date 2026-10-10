@@ -61,3 +61,19 @@ def test_vfs_info_without_vfs(capsys):
     assert result is False
     captured = capsys.readouterr()
     assert "No VFS" in captured.out
+
+
+def test_cat_missing_file(capsys):
+    """Test cat command without file argument."""
+    result = execute_command("cat", [], _make_ctx())
+    assert result is False
+    captured = capsys.readouterr()
+    assert "missing file" in captured.out
+
+
+def test_rm_missing_file(capsys):
+    """Test rm command without file argument."""
+    result = execute_command("rm", [], _make_ctx())
+    assert result is False
+    captured = capsys.readouterr()
+    assert "missing file" in captured.out

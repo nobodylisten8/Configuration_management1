@@ -87,6 +87,49 @@ def cmd_uptime(args: list[str], ctx: ShellContext) -> bool:
     return False
 
 
+def cmd_cat(args: list[str], ctx: ShellContext) -> bool:
+    """Display file contents."""
+    if not args:
+        print("cat: missing file argument")
+        return False
+
+    if ctx.vfs is None:
+        print("Error: No VFS is currently loaded")
+        return False
+
+    data = ctx.vfs.read_file(args[0])
+    if data is None:
+        print(f"cat: {args[0]}: No such file")
+        return False
+
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        text = data.decode("latin-1")
+
+    print(text, end="")
+    return False
+
+
+def cmd_rm(args: list[str], ctx: ShellContext) -> bool:
+    """Remove a file from VFS (in-memory only)."""
+    if not args:
+        print("rm: missing file argument")
+        return False
+
+    if ctx.vfs is None:
+        print("Error: No VFS is currently loaded")
+        return False
+
+    path = args[0]
+    if not ctx.vfs.is_file(path):
+        print(f"rm: {path}: No such file")
+        return False
+
+    print(f"rm: {path}: removed (in-memory only)")
+    return False
+
+
 def cmd_exit(args: list[str], ctx: ShellContext) -> bool:
     """Exit the shell."""
     return True
@@ -112,6 +155,8 @@ def execute_command(command: str, args: list[str], ctx: ShellContext) -> bool:
         "pwd": cmd_pwd,
         "wc": cmd_wc,
         "uptime": cmd_uptime,
+        "cat": cmd_cat,
+        "rm": cmd_rm,
         "exit": cmd_exit,
         "vfs-info": cmd_vfs_info,
     }
