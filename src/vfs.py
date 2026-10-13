@@ -12,12 +12,7 @@ class VFS:
     """In-memory Virtual File System backed by a ZIP archive."""
 
     def __init__(self, path: str) -> None:
-        """
-        Initialize VFS with a given path.
-
-        Args:
-            path: Path to the ZIP or base64-encoded ZIP file
-        """
+        """Initialize VFS with a given path."""
         self.path = path
         self.name = Path(path).name
         self._zip_data: Optional[bytes] = None
@@ -26,12 +21,7 @@ class VFS:
         self._cwd = ""
 
     def load(self) -> bool:
-        """
-        Load VFS data into memory.
-
-        Returns:
-            True if loaded successfully, False otherwise
-        """
+        """Load VFS data into memory."""
         try:
             file_path = Path(self.path)
             if not file_path.exists():
@@ -61,42 +51,26 @@ class VFS:
             return False
 
     def get_info(self) -> dict:
-        """
-        Get VFS information.
-
-        Returns:
-            Dictionary with 'name' and 'sha256' keys
-        """
+        """Get VFS information."""
         return {
             "name": self.name,
             "sha256": self._sha256 or "Not loaded"
         }
 
-    def get_cwd(self) -> str:
-        """
-        Get current working directory.
+    def get_zip_file(self) -> Optional[zipfile.ZipFile]:
+        """Get the in-memory ZIP file object."""
+        return self._zip_file
 
-        Returns:
-            Current working directory path (with leading /)
-        """
+    def get_cwd(self) -> str:
+        """Get current working directory."""
         if not self._cwd:
             return "/"
         return "/" + self._cwd
 
     def _normalize(self, path: str) -> str:
-        """
-        Normalize path for ZIP lookup (no leading slash).
-
-        Args:
-            path: Path to normalize
-
-        Returns:
-            Normalized path without leading slash
-        """
+        """Normalize path for ZIP lookup (no leading slash)."""
         if path == "/" or path == ".":
-            if path == "/":
-                return ""
-            return self._cwd
+            return "" if path == "/" else self._cwd
 
         if path.startswith("/"):
             base = ""
@@ -105,10 +79,7 @@ class VFS:
             base = self._cwd
             rest = path
 
-        if base:
-            full = f"{base}/{rest}"
-        else:
-            full = rest
+        full = f"{base}/{rest}" if base else rest
 
         parts = []
         for p in full.split("/"):
@@ -123,15 +94,7 @@ class VFS:
         return "/".join(parts)
 
     def list_dir(self, path: Optional[str] = None) -> list[str]:
-        """
-        List contents of a directory.
-
-        Args:
-            path: Directory path (uses cwd if None)
-
-        Returns:
-            List of file/directory names
-        """
+        """List contents of a directory."""
         if self._zip_file is None:
             return []
 
@@ -142,10 +105,7 @@ class VFS:
         for name in self._zip_file.namelist():
             if prefix and not name.startswith(prefix):
                 continue
-            if prefix:
-                relative = name[len(prefix):]
-            else:
-                relative = name
+            relative = name[len(prefix):] if prefix else name
             first_part = relative.split("/")[0]
             if first_part:
                 entries.add(first_part)
@@ -153,15 +113,7 @@ class VFS:
         return sorted(entries)
 
     def is_file(self, path: str) -> bool:
-        """
-        Check if a path is a file.
-
-        Args:
-            path: Path to check
-
-        Returns:
-            True if path is a file
-        """
+        """Check if a path is a file."""
         if self._zip_file is None:
             return False
 
@@ -173,15 +125,7 @@ class VFS:
             return False
 
     def read_file(self, path: str) -> Optional[bytes]:
-        """
-        Read file contents.
-
-        Args:
-            path: Path to file
-
-        Returns:
-            File contents as bytes, or None if not found
-        """
+        """Read file contents."""
         if self._zip_file is None:
             return None
 
@@ -192,15 +136,7 @@ class VFS:
             return None
 
     def change_dir(self, path: str) -> bool:
-        """
-        Change current working directory.
-
-        Args:
-            path: New directory path
-
-        Returns:
-            True if successful, False otherwise
-        """
+        """Change current working directory."""
         if self._zip_file is None:
             return False
 

@@ -77,3 +77,11 @@ def test_rm_missing_file(capsys):
     assert result is False
     captured = capsys.readouterr()
     assert "missing file" in captured.out
+
+
+def test_ls_invalid_flag(capsys):
+    """Test ls command with invalid flag."""
+    result = execute_command("ls", ["-x"], _make_ctx())
+    assert result is False
+    captured = capsys.readouterr()
+    assert "invalid option" in captured.out
