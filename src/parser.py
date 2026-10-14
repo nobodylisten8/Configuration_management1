@@ -5,8 +5,6 @@ def parse_command(line: str) -> tuple[str, list[str]]:
     """
     Parse command line into command and arguments.
 
-    Handles quoted arguments correctly.
-
     Args:
         line: Input command line string
 
@@ -16,6 +14,26 @@ def parse_command(line: str) -> tuple[str, list[str]]:
     if not line.strip():
         return "", []
 
+    tokens = _tokenize(line)
+
+    if not tokens:
+        return "", []
+
+    command = tokens[0]
+    arguments = tokens[1:] if len(tokens) > 1 else []
+    return command, arguments
+
+
+def _tokenize(line: str) -> list[str]:
+    """
+    Tokenize a command line respecting quoted strings.
+
+    Args:
+        line: Input command line string
+
+    Returns:
+        List of tokens
+    """
     tokens = []
     current_token = ""
     in_quotes = False
@@ -41,10 +59,4 @@ def parse_command(line: str) -> tuple[str, list[str]]:
     if current_token:
         tokens.append(current_token)
 
-    if not tokens:
-        return "", []
-
-    command = tokens[0]
-    arguments = tokens[1:] if len(tokens) > 1 else []
-
-    return command, arguments
+    return tokens
