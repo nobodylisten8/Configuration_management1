@@ -98,29 +98,11 @@ class VFS:
                 return ""
             return self._cwd
 
-        if path.startswith("/"):
-            base = ""
-            rest = path[1:]
-        else:
-            base = self._cwd
-            rest = path
+        base = "" if path.startswith("/") else self._cwd
+        rest = path[1:] if path.startswith("/") else path
+        full = f"{base}/{rest}" if base else rest
 
-        if base:
-            full = f"{base}/{rest}"
-        else:
-            full = rest
-
-        parts = []
-        for p in full.split("/"):
-            if p == "." or p == "":
-                continue
-            elif p == "..":
-                if parts:
-                    parts.pop()
-            else:
-                parts.append(p)
-
-        return "/".join(parts)
+        return _resolve_path_parts(full.split("/"))
 
     def list_dir(self, path: Optional[str] = None) -> list[str]:
         """
@@ -217,3 +199,25 @@ class VFS:
                 return True
 
         return False
+
+
+def _resolve_path_parts(parts: list[str]) -> str:
+    """
+    Resolve path parts by handling '.' and '..' segments.
+
+    Args:
+        parts: List of path segments
+
+    Returns:
+        Normalized path string
+    """
+    resolved = []
+    for part in parts:
+        if part == "." or part == "":
+            continue
+        if part == "..":
+            if resolved:
+                resolved.pop()
+        else:
+            resolved.append(part)
+    return "/".join(resolved)
